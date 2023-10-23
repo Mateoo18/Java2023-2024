@@ -1,2 +1,2 @@
 # java2023public
-Lab for Java
+Zrobione zadanie, które sprawdza czy dany rok jest rokiem przestępnym.
