@@ -3,6 +3,7 @@ package org.leapyear;
 public class LeapYearCalculator {
 
   public static boolean isLeapYear(int year) {
+    //Dodanie czegos abym mogl wyslac pull requesta :)
     if (year >= 1 && year <= 9999) {
 
       if (year % 4 == 0) {
