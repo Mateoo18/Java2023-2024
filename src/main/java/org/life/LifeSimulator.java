@@ -4,6 +4,7 @@ public class LifeSimulator {
 
   public static void main(String[] args) {
     Board board = new Board(10, 10);
+
     /* TODO:
      - Add at least 2 classes that implement the Organism interface.
      - The new classes should possess unique abilities, such as:
