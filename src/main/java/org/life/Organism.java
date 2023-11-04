@@ -2,17 +2,20 @@ package org.life;
 
 import java.util.Random;
 
-public class Organism {
+public class Organism  {
 
-  private int energy;
-  private Position position;
+  public int energy;
+  public int bite;
+  public Position position;
   private Random random = new Random();
 
-  public Organism(int energy) {
+  public Organism(int energy,int bite) {
     this.energy = energy;
+    this.bite=bite;
   }
 
-  public void move() {
+  public Position move() {
+    Position nowa_dla_ruchu_pozycja=new Position(0,0);
     int newX = position.getX();
     int newY = position.getY();
 
@@ -26,7 +29,9 @@ public class Organism {
       // Move left or right by 1
       newX += random.nextBoolean() ? 1 : -1;
     }
-
+    nowa_dla_ruchu_pozycja.x=newX;
+    nowa_dla_ruchu_pozycja.y=newY;
+    return nowa_dla_ruchu_pozycja;
     // TODO: Use the board's moveOrganism method to move the organism
   }
 
