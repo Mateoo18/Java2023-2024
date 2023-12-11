@@ -19,7 +19,6 @@ class CommentableAndRateableResourceTest {
 
     @Test
     void testCommentAndRating() {
-        // Access the specific functionalities of each decorator
         ((CommentableResource) ((RateableResource) decoratedResource).getDecoratedResource()).addComment("Very informative course");
         ((RateableResource) decoratedResource).setRating(5.0);
 
