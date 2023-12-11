@@ -22,6 +22,5 @@ return id;
     public void setName(String name){//change
         this.name=name;
     }
-    // Constructor, getters, setters
-    // Implement all necessary methods from StudentResource
+
 }

@@ -9,10 +9,10 @@ public class StudentResourceManager<T extends StudentResource> {
     public StudentResourceManager(){
         this.resources=new ArrayList<>();
     }
-    public T getResource(String cs101) {
-        for(T obiekt:resources){
-            if(obiekt.getId().equals(cs101)){
-                return obiekt;
+    public T getResource(String id) {
+        for(T object:resources){
+            if(object.getId().equals(id)){
+                return object;
             }
         }
         return null;
@@ -21,17 +21,15 @@ public class StudentResourceManager<T extends StudentResource> {
     {
         resources.add(obj);
     }
-    public int remove(String idee)
+    public int remove(String id)
     {
-        for(T obiekt:resources){
-            if(obiekt.getId().equals(idee)){
-                resources.remove(obiekt);
+        for(T object:resources){
+            if(object.getId().equals(id)){
+                resources.remove(object);
                 return 1;
             }
         }
         return -1;
     }
-
-    // Implement methods to manage resources (add, remove, find, etc.)
 
 }

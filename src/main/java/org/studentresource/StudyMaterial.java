@@ -1,9 +1,9 @@
 package org.studentresource;
 
-public class Studymaterial implements StudentResource{
+public class StudyMaterial implements StudentResource{
     private String id;
     private String name;
-    public Studymaterial(String id,String name)
+    public StudyMaterial(String id, String name)
     {
         this.id=id;
         this.name=name;

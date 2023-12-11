@@ -13,8 +13,8 @@ public class RateableResource extends ResourceDecorator{
         return decoratedResource;
     }
 
-    public void setRating(double v) {
-        rate=v;
+    public void setRating(double value) {
+        rate=value;
     }
 
     public double getRating() {
@@ -23,11 +23,11 @@ public class RateableResource extends ResourceDecorator{
 
     @Override
     public String getId() {
-        return null;
+        return decoratedResource.getId();
     }
 
     @Override
     public String getName() {
-        return null;
+        return decoratedResource.getName();
     }
 }
