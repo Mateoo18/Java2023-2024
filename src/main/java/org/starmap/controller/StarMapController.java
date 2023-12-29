@@ -3,6 +3,7 @@ package org.starmap.controller;
 import org.starmap.model.Constellation;
 import org.starmap.model.Star;
 import org.starmap.utils.DataLoader;
+import org.starmap.view.NumberSizeException;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,7 @@ public class StarMapController {
     private List<Star> stars;
     private List<Constellation> constellations;
 
-    public StarMapController(String dataFilePath) {
+    public StarMapController(String dataFilePath) throws NumberSizeException {
         this.stars = DataLoader.loadStars(dataFilePath);
         this.constellations = DataLoader.loadConstellations(dataFilePath, stars);
     }
@@ -50,7 +51,14 @@ public class StarMapController {
 
     // Remove a star from the map
     public void removeStar(String name) {
-        stars.removeIf(star -> star.getName().equalsIgnoreCase(name));
+        Optional<Star> starToRemove = stars.stream()
+                .filter(star -> star.getName().equalsIgnoreCase(name))
+                .findFirst();
+
+        starToRemove.ifPresent(star -> {
+            stars.remove(star);
+            constellations.forEach(constellation -> constellation.removeStar(star));
+        });
     }
 
     // Add a new constellation to the map
@@ -61,5 +69,33 @@ public class StarMapController {
     // Remove a constellation from the map
     public void removeConstellation(String name) {
         constellations.removeIf(constellation -> constellation.getName().equalsIgnoreCase(name));
+    }
+
+    public void addStartoConst(Star star,String constellationName) {
+        stars.add(star);
+        // Sprawdź, czy konstelacja istnieje
+        Optional<Constellation> optionalConstellation = getConstellationByName(constellationName);
+        if (optionalConstellation.isPresent()) {
+            // Jeśli konstelacja istnieje, dodaj gwiazdę do jej listy gwiazd
+            Constellation constellation = optionalConstellation.get();
+            constellation.addStar(star);
+        }
+
+    }
+    public void setNewStarBrightness(String starName,double brightness){
+        for (Star star:stars){
+            if(star.getName().equalsIgnoreCase(starName)){
+               star.setBrightness(brightness);
+               break;
+            }
+        }
+    }
+    public void setNewStarName(String oldname,String newname){
+        for (Star star:stars){
+            if(star.getName().equalsIgnoreCase(oldname)){
+                star.setName(newname);
+                break;
+            }
+        }
     }
 }

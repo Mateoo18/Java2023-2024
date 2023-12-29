@@ -5,6 +5,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.starmap.controller.StarMapController;
+import org.starmap.view.NumberSizeException;
 import org.starmap.view.StarMapView;
 
 // Main application class for the star map
@@ -15,13 +16,12 @@ public class MainApp extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws NumberSizeException {
         StarMapController controller = new StarMapController("src/main/resources/stars.json");
         StarMapView view = new StarMapView(controller);
 
         Group root = new Group(); // Create Group container
-        root.getChildren().add(view); // Add StarMapView to container
-
+        root.getChildren().addAll(view,view.getMenuBar()); // Add StarMapView to container
         Scene scene = new Scene(root, 1024, 768); // Create Scene with Group container
 
         primaryStage.setTitle("Star Map");
