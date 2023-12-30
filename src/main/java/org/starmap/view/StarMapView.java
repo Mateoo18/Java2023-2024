@@ -21,6 +21,7 @@ import java.util.Random;
 import java.util.Optional;
 
 import javafx.scene.layout.GridPane;
+import org.starmap.utils.DataWriter;
 
 import javax.swing.*;
 
@@ -143,6 +144,7 @@ public class StarMapView extends Canvas {
                 pause.playFromStart();
             }
         });
+
        this.setOnMouseDragged(event -> {
             double mouseX = event.getX();
             double mouseY = event.getY();
@@ -161,7 +163,10 @@ public class StarMapView extends Canvas {
             }
             pause.playFromStart();
             drawMap();
-        });
+           pause.setOnFinished(e -> {
+               DataWriter.writeDataToFile("src/main/resources/stars.json", controller.getStars(), controller.getConstellations());
+           });
+       });
 
     }
 
@@ -285,6 +290,7 @@ public class StarMapView extends Canvas {
             controller.addStar(star);
             pause.playFromStart();
         });
+        DataWriter.writeDataToFile("src/main/resources/stars.json",controller.getStars(),controller.getConstellations());
     }
     private void showRemoveStarDialog() {
         Dialog<String> dialog = new Dialog<>();
@@ -315,6 +321,7 @@ public class StarMapView extends Canvas {
             controller.removeStar(starName);
             pause.playFromStart();
         });
+        DataWriter.writeDataToFile("src/main/resources/stars.json",controller.getStars(),controller.getConstellations());
     }
     public void addStarCons(){
         Dialog<Star> dialog = new Dialog<>();
@@ -382,6 +389,7 @@ public class StarMapView extends Canvas {
             controller.addStartoConst(star,constellationField.getText());
             pause.playFromStart();
         });
+        DataWriter.writeDataToFile("src/main/resources/stars.json",controller.getStars(),controller.getConstellations());
 
     }
     public void showChangeBrightness() {
@@ -433,7 +441,7 @@ public class StarMapView extends Canvas {
             controller.setNewStarBrightness(starName,newBrightness);
             pause.playFromStart();
         });
-
+        DataWriter.writeDataToFile("src/main/resources/stars.json",controller.getStars(),controller.getConstellations());
     }
     public void changeNameCons(){
         Dialog<Pair<String, String>> dialog = new Dialog<>();
@@ -487,7 +495,7 @@ public class StarMapView extends Canvas {
             clearCanvas();
             drawMap();
         });
-
+        DataWriter.writeDataToFile("src/main/resources/stars.json",controller.getStars(),controller.getConstellations());
     }
     public void changeNameofStar(){
         Dialog<Pair<String, String>> dialog = new Dialog<>();
@@ -532,7 +540,7 @@ public class StarMapView extends Canvas {
             clearCanvas();
             drawMap();
         });
-
+        DataWriter.writeDataToFile("src/main/resources/stars.json",controller.getStars(),controller.getConstellations());
     }
     public void showAxisXY(){
 
