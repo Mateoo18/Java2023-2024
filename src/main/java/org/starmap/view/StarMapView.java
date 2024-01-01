@@ -32,14 +32,14 @@ public class StarMapView extends Canvas {
     private Map<String, Color> constellationColors = new HashMap<>();
 
     private MenuBar menuBar;
-    private Star selectedStar = null;
-    private Button showAxesButton;
     private boolean axes;
+    private boolean isMouseDragging = false;
+
 
     public StarMapView(StarMapController controller) {
         this.controller = controller;
-        this.setWidth(1024); // Set canvas width
-        this.setHeight(768); // Set canvas height
+        this.setWidth(1024);
+        this.setHeight(768);
 
         drawMap();
         addMenu();
@@ -51,7 +51,7 @@ public class StarMapView extends Canvas {
         List<Constellation> constellations = controller.getConstellations();
         for (Constellation constellation : constellations) {
             int hash = constellation.getName().hashCode();
-            Random rand = new Random(hash); // Use hash as a seed for random generator
+            Random rand = new Random(hash);
             Color color = new Color(rand.nextDouble(), rand.nextDouble(), rand.nextDouble(), 1);
             constellationColors.put(constellation.getName(), color);
         }
@@ -60,7 +60,7 @@ public class StarMapView extends Canvas {
     public void drawMap() {
         GraphicsContext gc = getGraphicsContext2D();
         gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, getWidth(), getHeight()); // Set background to black
+        gc.fillRect(0, 0, getWidth(), getHeight());
         if(axes)showAxisXY();
         drawStars();
         drawConstellations();
@@ -101,25 +101,29 @@ public class StarMapView extends Canvas {
             gc.setLineWidth(1);
             gc.setFill(lineColor);
             gc.setFont(new Font("Arial", 14));
-          //  System.out.println("CHUJ");
             List<Star> starsInConstellation = constellation.getStars();
             for (int i = 0; i < starsInConstellation.size() - 1; i++) {
                 Star start = starsInConstellation.get(i);
-                //System.out.println(start.getName());
                 Star end = starsInConstellation.get(i + 1);
                 gc.strokeLine(start.getXPosition(), start.getYPosition(), end.getXPosition(), end.getYPosition());
             }
 
-            // Rysuj nazwę konstelacji obok pierwszej gwiazdy
             if (!starsInConstellation.isEmpty()) {
                 Star firstStar = starsInConstellation.get(0);
                 gc.fillText(constellation.getName(), firstStar.getXPosition(), firstStar.getYPosition() - 15);
             }
         }
-        //pause.playFromStart();
     }
 
+
     private void addMouseMotionListener() {
+        this.setOnMousePressed(event -> isMouseDragging = true);
+
+        this.setOnMouseReleased(event -> {
+            isMouseDragging = false;
+            DataWriter.writeDataToFile("src/main/resources/stars.json", controller.getStars(), controller.getConstellations());
+        });
+
         this.setOnMouseMoved(event -> {
             double mouseX = event.getX();
             double mouseY = event.getY();
@@ -134,7 +138,7 @@ public class StarMapView extends Canvas {
 
             if (foundStar != null && foundStar != currentHoveredStar) {
                 currentHoveredStar = foundStar;
-                pause.stop(); // Zatrzymaj poprzednie opóźnienie
+                pause.stop();
                 drawStarName(foundStar);
             } else if (foundStar == null && currentHoveredStar != null) {
                 pause.setOnFinished(e -> {
@@ -161,12 +165,15 @@ public class StarMapView extends Canvas {
                 foundStar.setXPosition(event.getX());
                 foundStar.setYPosition(event.getY());
             }
-            pause.playFromStart();
+
             drawMap();
            pause.setOnFinished(e -> {
                DataWriter.writeDataToFile("src/main/resources/stars.json", controller.getStars(), controller.getConstellations());
            });
+           // DataWriter.writeDataToFile("src/main/resources/stars.json", controller.getStars(), controller.getConstellations());
+
        });
+       pause.playFromStart();
 
     }
 
@@ -180,7 +187,7 @@ public class StarMapView extends Canvas {
         if (currentHoveredStar != null) {
             pause.setOnFinished(e -> {
                 clearCanvas();
-                drawMap(); // Rysuj wszystko od nowa
+                drawMap();
             });
             pause.playFromStart();
         }
@@ -189,10 +196,9 @@ public class StarMapView extends Canvas {
     private void clearCanvas() {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
-        //if(axes)showAxisXY();
     }
     private void addMenu(){
-        Menu fileMenu =new Menu("Options");
+        Menu fileMenu =new Menu("View Stars");
         MenuItem addItem=new MenuItem("Add Star");
         addItem.setOnAction(event -> showAddStarDialog());
         MenuItem deleteItem=new MenuItem("Remove Star");
@@ -233,19 +239,17 @@ public class StarMapView extends Canvas {
         dialog.setTitle("Add Star");
         dialog.setHeaderText("Enter star details:");
 
-        // Utwórz pola tekstowe do wprowadzenia informacji o gwiazdzie
+
         TextField nameField = new TextField();
         TextField xPositionField = new TextField();
         TextField yPositionField = new TextField();
         TextField brightnessField = new TextField();
 
-        // Ustaw etykiety dla pól
         Label nameLabel = new Label("Name:");
         Label xPositionLabel = new Label("X Position:");
         Label yPositionLabel = new Label("Y Position:");
         Label brightnessLabel = new Label("Brightness:");
 
-        // Ustaw rozkład siatki
         GridPane grid = new GridPane();
         grid.add(nameLabel, 1, 1);
         grid.add(nameField, 2, 1);
@@ -258,7 +262,6 @@ public class StarMapView extends Canvas {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Ustaw przyciski "OK" i "Cancel"
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.setResultConverter(buttonType -> {
@@ -269,23 +272,19 @@ public class StarMapView extends Canvas {
                     double yPosition = Double.parseDouble(yPositionField.getText());
                     double brightness = Double.parseDouble(brightnessField.getText());
 
-                    // Zwróć nowy obiekt Star z wprowadzonymi danymi
                     return new Star(name, xPosition, yPosition, brightness);
                 } catch (NumberFormatException e) {
-                    // W razie błędu konwersji, zwróć null
                     return null;
                 }
                 catch(NumberSizeException e){
-                    System.out.println("Wystapil blad! " + e.getMessage());
+                    System.out.println("Error! " + e.getMessage());
                 }
             }
             return null;
         });
 
-        // Wyświetl okno dialogowe
         Optional<Star> result = dialog.showAndWait();
 
-        // Jeśli użytkownik wprowadził poprawne dane, dodaj nową gwiazdę
         result.ifPresent(star -> {
             controller.addStar(star);
             pause.playFromStart();
@@ -297,7 +296,6 @@ public class StarMapView extends Canvas {
         dialog.setTitle("Remove Star");
         dialog.setHeaderText("Enter star name to remove:");
 
-        // Utwórz pole tekstowe do wprowadzenia nazwy gwiazdy
         TextField nameField = new TextField();
         Label nameLabel = new Label("Star Name:");
         GridPane grid = new GridPane();
@@ -316,7 +314,6 @@ public class StarMapView extends Canvas {
 
         Optional<String> result = dialog.showAndWait();
 
-        // Jeśli użytkownik wprowadził nazwę gwiazdy, usuń gwiazdę
         result.ifPresent(starName -> {
             controller.removeStar(starName);
             pause.playFromStart();
@@ -328,21 +325,18 @@ public class StarMapView extends Canvas {
         dialog.setTitle("Add Star");
         dialog.setHeaderText("Enter star details:");
 
-        // Utwórz pola tekstowe do wprowadzenia informacji o gwiazdzie
         TextField nameField = new TextField();
         TextField xPositionField = new TextField();
         TextField yPositionField = new TextField();
         TextField brightnessField = new TextField();
         TextField constellationField =new TextField();
 
-        // Ustaw etykiety dla pól
         Label nameLabel = new Label("Name:");
         Label xPositionLabel = new Label("X Position:");
         Label yPositionLabel = new Label("Y Position:");
         Label brightnessLabel = new Label("Brightness:");
         Label constellationLabel = new Label("Constellation:");
 
-        // Ustaw rozkład siatki
         GridPane grid = new GridPane();
         grid.add(nameLabel, 1, 1);
         grid.add(nameField, 2, 1);
@@ -357,7 +351,6 @@ public class StarMapView extends Canvas {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Ustaw przyciski "OK" i "Cancel"
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.setResultConverter(buttonType -> {
@@ -368,23 +361,19 @@ public class StarMapView extends Canvas {
                     double yPosition = Double.parseDouble(yPositionField.getText());
                     double brightness = Double.parseDouble(brightnessField.getText());
                     String constellation =constellationField.getText();
-                    // Zwróć nowy obiekt Star z wprowadzonymi danymi
                     return new Star(name, xPosition, yPosition, brightness);
                 } catch (NumberFormatException e) {
-                    // W razie błędu konwersji, zwróć null
                     return null;
                 }
                 catch(NumberSizeException e){
-                    System.out.println("Wystapil blad! " + e.getMessage());
+                    System.out.println("Error! " + e.getMessage());
                 }
             }
             return null;
         });
 
-        // Wyświetl okno dialogowe
         Optional<Star> result = dialog.showAndWait();
 
-        // Jeśli użytkownik wprowadził poprawne dane, dodaj nową gwiazdę
         result.ifPresent(star -> {
             controller.addStartoConst(star,constellationField.getText());
             pause.playFromStart();
@@ -397,15 +386,12 @@ public class StarMapView extends Canvas {
         dialog.setTitle("Change Brightness");
         dialog.setHeaderText("Enter star name and new brightness:");
 
-        // Utwórz pola tekstowe do wprowadzenia informacji o gwiazdzie
         TextField nameField = new TextField();
         TextField brightnessField = new TextField();
 
-        // Ustaw etykiety dla pól
         Label nameLabel = new Label("Star Name:");
         Label brightnessLabel = new Label("New Brightness:");
 
-        // Ustaw rozkład siatki
         GridPane grid = new GridPane();
         grid.add(nameLabel, 1, 1);
         grid.add(nameField, 2, 1);
@@ -414,7 +400,6 @@ public class StarMapView extends Canvas {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Ustaw przyciski "OK" i "Cancel"
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.setResultConverter(buttonType -> {
@@ -423,10 +408,8 @@ public class StarMapView extends Canvas {
                     String name = nameField.getText();
                     double newBrightness = Double.parseDouble(brightnessField.getText());
 
-                    // Zwróć parę nazwy gwiazdy i nowej jasności
                     return new Pair<>(name, newBrightness);
                 } catch (NumberFormatException e) {
-                    // W razie błędu konwersji, zwróć null
                     return null;
                 }
             }
@@ -434,7 +417,6 @@ public class StarMapView extends Canvas {
         });
         Optional<Pair<String, Double>> result = dialog.showAndWait();
 
-        // Jeśli użytkownik wprowadził poprawne dane, zmień jasność gwiazdy
         result.ifPresent(pair -> {
             String starName = pair.getKey();
             double newBrightness = pair.getValue();
@@ -448,15 +430,12 @@ public class StarMapView extends Canvas {
         dialog.setTitle("Change Constellation Name");
         dialog.setHeaderText("Enter current and new constellation names:");
 
-        // Utwórz pola tekstowe do wprowadzenia obecnej i nowej nazwy konstelacji
         TextField currentNameField = new TextField();
         TextField newNameField = new TextField();
 
-        // Ustaw etykiety dla pól
         Label currentNameLabel = new Label("Current Name:");
         Label newNameLabel = new Label("New Name:");
 
-        // Ustaw rozkład siatki
         GridPane grid = new GridPane();
         grid.add(currentNameLabel, 1, 1);
         grid.add(currentNameField, 2, 1);
@@ -465,7 +444,6 @@ public class StarMapView extends Canvas {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Ustaw przyciski "OK" i "Cancel"
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.setResultConverter(buttonType -> {
@@ -477,21 +455,18 @@ public class StarMapView extends Canvas {
 
         Optional<Pair<String, String>> result = dialog.showAndWait();
 
-        // Jeśli użytkownik podał obecną i nową nazwę konstelacji, zmień jej nazwę
         result.ifPresent(pair -> {
             String currentName = pair.getKey();
             String newName = pair.getValue();
 
-            // Znajdź konstelację o podanej obecnej nazwie
             List<Constellation> constellations = controller.getConstellations();
             for (Constellation constellation : constellations) {
                 if (constellation.getName().equals(currentName)) {
-                    // Znaleziono konstelację, zmień jej nazwę
                     constellation.setName(newName);
                     break;
                 }
             }
-            // Odśwież widok
+
             clearCanvas();
             drawMap();
         });
@@ -502,15 +477,12 @@ public class StarMapView extends Canvas {
         dialog.setTitle("Change Star Name");
         dialog.setHeaderText("Enter current and new Star names:");
 
-        // Utwórz pola tekstowe do wprowadzenia obecnej i nowej nazwy konstelacji
         TextField currentNameField = new TextField();
         TextField newNameField = new TextField();
 
-        // Ustaw etykiety dla pól
         Label currentNameLabel = new Label("Current Name:");
         Label newNameLabel = new Label("New Name:");
 
-        // Ustaw rozkład siatki
         GridPane grid = new GridPane();
         grid.add(currentNameLabel, 1, 1);
         grid.add(currentNameField, 2, 1);
@@ -519,7 +491,6 @@ public class StarMapView extends Canvas {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Ustaw przyciski "OK" i "Cancel"
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.setResultConverter(buttonType -> {
@@ -531,12 +502,10 @@ public class StarMapView extends Canvas {
 
         Optional<Pair<String, String>> result = dialog.showAndWait();
 
-        // Jeśli użytkownik podał obecną i nową nazwę konstelacji, zmień jej nazwę
         result.ifPresent(pair -> {
             String currentName = pair.getKey();
             String newName = pair.getValue();
             controller.setNewStarName(currentName,newName);
-            // Odśwież widok
             clearCanvas();
             drawMap();
         });
@@ -548,10 +517,7 @@ public class StarMapView extends Canvas {
             gc.setStroke(Color.WHITE);
             gc.setLineWidth(0.5);
             axes = true;
-            // Rysuj oś X
             gc.strokeLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
-
-            // Rysuj oś Y
             gc.strokeLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
 pause.playFromStart();
     }

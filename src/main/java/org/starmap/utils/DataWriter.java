@@ -15,8 +15,6 @@ public class DataWriter {
 
         public static void writeDataToFile(String filePath, List<Star> stars, List<Constellation> constellations) {
             JSONObject jsonData = new JSONObject();
-            System.out.println("?????");
-            // Write stars
             JSONArray starsJsonArray = new JSONArray();
             for (Star star : stars) {
                 JSONObject starJson = new JSONObject();
@@ -28,7 +26,6 @@ public class DataWriter {
             }
             jsonData.put("stars", starsJsonArray);
 
-            // Write constellations
             JSONArray constellationsJsonArray = new JSONArray();
             for (Constellation constellation : constellations) {
                 JSONObject constellationJson = new JSONObject();
@@ -45,9 +42,9 @@ public class DataWriter {
             }
             jsonData.put("constellations", constellationsJsonArray);
 
-            // Write data to the file
+
             try (FileWriter fileWriter = new FileWriter(filePath)) {
-                fileWriter.write(jsonData.toString(2)); // The second parameter specifies the number of spaces to use for indentation
+                fileWriter.write(jsonData.toString(2));
             } catch (IOException e) {
                 System.out.println("CHUJ");
                 e.printStackTrace();

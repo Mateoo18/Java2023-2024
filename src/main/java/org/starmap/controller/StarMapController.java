@@ -34,22 +34,19 @@ public class StarMapController {
         this.constellations = constellations;
     }
 
-    // Get a star by its name
     public Optional<Star> getStarByName(String name) {
         return stars.stream().filter(star -> star.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    // Get a constellation by its name
     public Optional<Constellation> getConstellationByName(String name) {
         return constellations.stream().filter(constellation -> constellation.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    // Add a new star to the map
+
     public void addStar(Star star) {
         stars.add(star);
     }
 
-    // Remove a star from the map
     public void removeStar(String name) {
         Optional<Star> starToRemove = stars.stream()
                 .filter(star -> star.getName().equalsIgnoreCase(name))
@@ -61,22 +58,19 @@ public class StarMapController {
         });
     }
 
-    // Add a new constellation to the map
     public void addConstellation(Constellation constellation) {
         constellations.add(constellation);
     }
 
-    // Remove a constellation from the map
     public void removeConstellation(String name) {
         constellations.removeIf(constellation -> constellation.getName().equalsIgnoreCase(name));
     }
 
     public void addStartoConst(Star star,String constellationName) {
         stars.add(star);
-        // Sprawdź, czy konstelacja istnieje
+
         Optional<Constellation> optionalConstellation = getConstellationByName(constellationName);
         if (optionalConstellation.isPresent()) {
-            // Jeśli konstelacja istnieje, dodaj gwiazdę do jej listy gwiazd
             Constellation constellation = optionalConstellation.get();
             constellation.addStar(star);
         }
@@ -90,10 +84,10 @@ public class StarMapController {
             }
         }
     }
-    public void setNewStarName(String oldname,String newname){
+    public void setNewStarName(String oldName,String newName){
         for (Star star:stars){
-            if(star.getName().equalsIgnoreCase(oldname)){
-                star.setName(newname);
+            if(star.getName().equalsIgnoreCase(oldName)){
+                star.setName(newName);
                 break;
             }
         }

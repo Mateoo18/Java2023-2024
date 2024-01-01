@@ -20,13 +20,13 @@ public class MainApp extends Application {
         StarMapController controller = new StarMapController("src/main/resources/stars.json");
         StarMapView view = new StarMapView(controller);
 
-        Group root = new Group(); // Create Group container
-        root.getChildren().addAll(view,view.getMenuBar()); // Add StarMapView to container
-        Scene scene = new Scene(root, 1024, 768); // Create Scene with Group container
+        Group root = new Group();
+        root.getChildren().addAll(view,view.getMenuBar());
+        Scene scene = new Scene(root, 1024, 768);
 
         primaryStage.setTitle("Star Map");
         primaryStage.setScene(scene);
         primaryStage.show();
-        view.drawMap(); // Call this after the scene is shown
+        view.drawMap();
     }
 }

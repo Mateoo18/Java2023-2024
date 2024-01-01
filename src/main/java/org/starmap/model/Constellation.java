@@ -12,7 +12,6 @@ public class Constellation {
         this.stars = stars;
     }
 
-    // Getters
     public String getName() {
         return name;
     }

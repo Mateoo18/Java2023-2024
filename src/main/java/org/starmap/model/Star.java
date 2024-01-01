@@ -10,7 +10,7 @@ public class Star {
      private double brightness;
 
     public Star(String name, double xPosition, double yPosition, double brightness) throws NumberSizeException {
-       if(xPosition<0  || xPosition>1024) {
+       if(xPosition<10  || xPosition>1024) {
            throw new NumberSizeException("Invalid x Position");
        }
        if(yPosition<0 || yPosition>768){
@@ -25,7 +25,6 @@ public class Star {
         this.brightness = brightness;
     }
 
-    // Getters and setters
     public String getName() {
         return name;
     }
