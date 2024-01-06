@@ -46,7 +46,7 @@ public class DataWriter {
             try (FileWriter fileWriter = new FileWriter(filePath)) {
                 fileWriter.write(jsonData.toString(2));
             } catch (IOException e) {
-                System.out.println("CHUJ");
+        
                 e.printStackTrace();
             }
         }
