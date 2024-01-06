@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Starmap" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.starmap.MainApp" />
+    <module name="java2023public" />
+    <option name="VM_PARAMETERS" value="--module-path /opt/openjfx/javafx-sdk-17/lib --add-modules javafx.controls,javafx.fxml" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.starmap.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.starmap.model.Constellation;
 import org.starmap.model.Star;
+import org.starmap.view.NumberSizeException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,7 +15,7 @@ import java.util.List;
 // Utility class for loading star and constellation data from a JSON file
 public class DataLoader {
 
-    public static List<Star> loadStars(String filePath) {
+    public static List<Star> loadStars(String filePath) throws NumberSizeException {
         List<Star> stars = new ArrayList<>();
         try {
             String content = new String(Files.readAllBytes(Paths.get(filePath)));
