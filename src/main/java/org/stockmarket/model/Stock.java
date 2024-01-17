@@ -11,7 +11,6 @@ public class Stock {
         this.price = price;
     }
 
-    // Getters and setters
     public String getSymbol() {
         return symbol;
     }
