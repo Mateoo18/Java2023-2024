@@ -1,46 +1,58 @@
 package org.chatbot.database;
 
+import java.io.Closeable;
 import java.sql.*;
 
-public class DatabaseConnection implements IDatabaseConnection {
-    private Connection connection;
+public class DatabaseConnection implements IDatabaseConnection, AutoCloseable, Closeable {
+    private final Connection connection;
+    private final PreparedStatement insertStatement;
+    private final PreparedStatement deleteStatement;
 
-    // TODO: Implementacja połączenia z bazą danych
     public DatabaseConnection(String url, String user, String password) throws SQLException {
         connection = DriverManager.getConnection(url, user, password);
+        insertStatement = connection.prepareStatement("INSERT INTO reservations(customer_name, reservation_time, number_of_guests) VALUES (?, ?, ?);");
+        deleteStatement = connection.prepareStatement("DELETE FROM reservations WHERE id = ?;");
     }
 
     @Override
     public void addReservation(String customerName, String reservationTime, int numberOfGuests) throws SQLException {
-        // TODO: Implementacja metody dodającej rezerwację do bazy danych
-        //  Użyj try with resource lub zamknij statement
-        String sql = "INSERT ...";
-        // ...
+        insertStatement.setString(1, customerName);
+        insertStatement.setTimestamp(2, Timestamp.valueOf(reservationTime));
+        insertStatement.setInt(3, numberOfGuests);
+        insertStatement.execute();
     }
 
     @Override
     public void deleteReservation(int reservationId) throws SQLException {
-        // TODO: Implementacja metody usuwającej rezerwację z bazy danych
-        //  Użyj try with resource lub zamknij statement
-        String sql = "DELETE ...";
-        // ...
+        deleteStatement.setInt(1, reservationId);
+        deleteStatement.execute();
     }
 
     @Override
     public ResultSet listReservations() throws SQLException {
-        // TODO: Implementacja metody zwracającej listę rezerwacji z bazy danych
-        //  Nie zamykaj w tym miejscu ResultSet.
-        String sql = "SELECT ...";
-        // ...
-        return null;
+        String sql = "SELECT * FROM reservations;";
+        Statement statement = connection.createStatement();
+        return statement.executeQuery(sql);
     }
 
-    // TODO: Metoda do zamknięcia połączenia z bazą danych
+    public void clearReservations() throws SQLException {
+        String sql = "DELETE FROM reservations;";
+        Statement statement = connection.createStatement();
+        statement.execute(sql);
+    }
+
     public void closeConnection() {
         try {
             connection.close();
+            deleteStatement.close();
+            insertStatement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void close() {
+        closeConnection();
     }
 }
