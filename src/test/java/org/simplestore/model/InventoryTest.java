@@ -2,9 +2,7 @@ package org.simplestore.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collection;
-
+import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InventoryTest {
@@ -35,18 +33,16 @@ class InventoryTest {
 
     @Test
     void listAllProducts() {
-        Collection<Product> products = inventory.listAllProducts();
+        ArrayList<Product> products = (ArrayList<Product>) inventory.listAllProducts();
         assertTrue(products.contains(product1), "Product list should contain Product1");
         assertTrue(products.contains(product2), "Product list should contain Product2");
         assertEquals(2, products.size(), "Product list should contain two products");
     }
 
     @Test
-    void removeProduct() {
-        inventory.removeProduct(1);
+    void removeProduct() throws ProductNotFoundException {
+        inventory.removeproduct(1);
         assertThrows(ProductNotFoundException.class, () -> inventory.getProduct(1), "Product1 should be removed and not found");
     }
 
-    // Note for presenter: Explain the importance of testing each functionality of the Inventory class.
-    // Discuss how these tests ensure the correctness of adding, retrieving, listing, and removing products.
 }
