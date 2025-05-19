@@ -21,3 +21,4 @@ public enum ResponseType {
         return String.format(message, args);
     }
 }
+//
