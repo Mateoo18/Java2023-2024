@@ -3,6 +3,7 @@ package org.starmap.controller;
 import org.starmap.model.Constellation;
 import org.starmap.model.Star;
 import org.starmap.utils.DataLoader;
+import org.starmap.view.NumberSizeException;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,7 @@ public class StarMapController {
     private List<Star> stars;
     private List<Constellation> constellations;
 
-    public StarMapController(String dataFilePath) {
+    public StarMapController(String dataFilePath) throws NumberSizeException {
         this.stars = DataLoader.loadStars(dataFilePath);
         this.constellations = DataLoader.loadConstellations(dataFilePath, stars);
     }
@@ -33,33 +34,62 @@ public class StarMapController {
         this.constellations = constellations;
     }
 
-    // Get a star by its name
     public Optional<Star> getStarByName(String name) {
         return stars.stream().filter(star -> star.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    // Get a constellation by its name
     public Optional<Constellation> getConstellationByName(String name) {
         return constellations.stream().filter(constellation -> constellation.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    // Add a new star to the map
+
     public void addStar(Star star) {
         stars.add(star);
     }
 
-    // Remove a star from the map
     public void removeStar(String name) {
-        stars.removeIf(star -> star.getName().equalsIgnoreCase(name));
+        Optional<Star> starToRemove = stars.stream()
+                .filter(star -> star.getName().equalsIgnoreCase(name))
+                .findFirst();
+
+        starToRemove.ifPresent(star -> {
+            stars.remove(star);
+            constellations.forEach(constellation -> constellation.removeStar(star));
+        });
     }
 
-    // Add a new constellation to the map
     public void addConstellation(Constellation constellation) {
         constellations.add(constellation);
     }
 
-    // Remove a constellation from the map
     public void removeConstellation(String name) {
         constellations.removeIf(constellation -> constellation.getName().equalsIgnoreCase(name));
+    }
+
+    public void addStartoConst(Star star,String constellationName) {
+        stars.add(star);
+
+        Optional<Constellation> optionalConstellation = getConstellationByName(constellationName);
+        if (optionalConstellation.isPresent()) {
+            Constellation constellation = optionalConstellation.get();
+            constellation.addStar(star);
+        }
+
+    }
+    public void setNewStarBrightness(String starName,double brightness){
+        for (Star star:stars){
+            if(star.getName().equalsIgnoreCase(starName)){
+               star.setBrightness(brightness);
+               break;
+            }
+        }
+    }
+    public void setNewStarName(String oldName,String newName){
+        for (Star star:stars){
+            if(star.getName().equalsIgnoreCase(oldName)){
+                star.setName(newName);
+                break;
+            }
+        }
     }
 }
